@@ -10,9 +10,16 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    yarn version
+                    yarn global add @angular/cli
+                    yarn install
+                    yarn ng build
                 '''
             }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts artifacts: 'dist/**', followSymlinks: false, onlyIfSuccessful: true
         }
     }
 }
