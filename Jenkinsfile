@@ -14,6 +14,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
+                    sed -i "s/%%VERSION%%/1.$BUILD_NUMBER/" src/app/features/article/pages/home/home.component.html
                     yarn global add @angular/cli
                     yarn install
                     yarn ng build
