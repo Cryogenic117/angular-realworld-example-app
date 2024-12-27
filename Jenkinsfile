@@ -1,16 +1,20 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:20-alpine'
+            reuseNode true
+            args '-u root:root'
+            }
+        }
+    environment {
+        NETLIFY_SITE_ID = '7836bb3e-8eab-4841-94c6-599f3bbd9c61'
+        NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+    }
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
-                    args '-u root:root'
-                }
-            }
             steps {
                 sh '''
+                    sed -i "s/%%VERSION%%/1.$BUILD_NUMBER/" src/app/features/article/pages/home/home.component.html
                     yarn global add @angular/cli
                     yarn install
                     yarn ng build
@@ -19,7 +23,9 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh '''           
+                sh '''
+                    yarn add netlify-cli -g
+                    yarn netlify deploy --dir=dist/angular-conduit/browser --prod      
                 '''
             }
         }
